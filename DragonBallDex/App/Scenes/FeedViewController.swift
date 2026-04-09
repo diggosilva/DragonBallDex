@@ -9,9 +9,18 @@ import UIKit
 
 class FeedViewController: UIViewController {
 
+    let service = Service()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        fetchData()
     }
 
+    func fetchData() {
+        Task {
+            let personagens = try await service.getCharacters()
+            print("DEBUG: \(personagens)")
+        }
+    }
 }
