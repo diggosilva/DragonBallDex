@@ -16,8 +16,8 @@ enum FeedVCState {
 }
 
 protocol FeedViewModelProtocol: StatefulViewModel where State == FeedVCState {
-    func numberOfRows() -> Int
-    func charForRow(at index: Int) -> Char
+    func numberOfItems() -> Int
+    func charForItem(at index: Int) -> Char
     func getCharacters()
 }
 
@@ -37,11 +37,11 @@ final class FeedViewModel: FeedViewModelProtocol {
         $state.eraseToAnyPublisher()
     }
     
-    func numberOfRows() -> Int {
+    func numberOfItems() -> Int {
         return chars.count
     }
     
-    func charForRow(at index: Int) -> Char {
+    func charForItem(at index: Int) -> Char {
         return chars[index]
     }
     
