@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		92D1DDDE2F8BC1940091F08F /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 92D1DDDD2F8BC1940091F08F /* SDWebImage */; };
+		92D1DDE12F8BC39A0091F08F /* UIImageColors in Frameworks */ = {isa = PBXBuildFile; productRef = 92D1DDE02F8BC39A0091F08F /* UIImageColors */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		92AA63C22F71D7E000249504 /* DragonBallDex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DragonBallDex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92D1DDE12F8BC39A0091F08F /* UIImageColors in Frameworks */,
+				92D1DDDE2F8BC1940091F08F /* SDWebImage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = DragonBallDex;
 			packageProductDependencies = (
+				92D1DDDD2F8BC1940091F08F /* SDWebImage */,
+				92D1DDE02F8BC39A0091F08F /* UIImageColors */,
 			);
 			productName = DragonBallDex;
 			productReference = 92AA63C22F71D7E000249504 /* DragonBallDex.app */;
@@ -107,6 +116,10 @@
 			);
 			mainGroup = 92AA63B92F71D7E000249504;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				92D1DDDC2F8BC1940091F08F /* XCRemoteSwiftPackageReference "SDWebImage" */,
+				92D1DDDF2F8BC39A0091F08F /* XCRemoteSwiftPackageReference "UIImageColors" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 92AA63C32F71D7E000249504 /* Products */;
 			projectDirPath = "";
@@ -341,6 +354,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		92D1DDDC2F8BC1940091F08F /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.21.7;
+			};
+		};
+		92D1DDDF2F8BC39A0091F08F /* XCRemoteSwiftPackageReference "UIImageColors" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jathu/UIImageColors";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		92D1DDDD2F8BC1940091F08F /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92D1DDDC2F8BC1940091F08F /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+		92D1DDE02F8BC39A0091F08F /* UIImageColors */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92D1DDDF2F8BC39A0091F08F /* XCRemoteSwiftPackageReference "UIImageColors" */;
+			productName = UIImageColors;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 92AA63BA2F71D7E000249504 /* Project object */;
 }
