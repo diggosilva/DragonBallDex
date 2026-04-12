@@ -20,7 +20,7 @@ final class FeedView: UIView {
         
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.translatesAutoresizingMaskIntoConstraints = false
-        collection.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collection.register(FeedCell.self, forCellWithReuseIdentifier: FeedCell.identifier)
         collection.backgroundColor = .secondarySystemBackground
         return collection
     }()
