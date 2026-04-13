@@ -17,4 +17,10 @@ struct Char: Codable {
     let description: String
     let image: String
     let affiliation: String
+    
+    var formattedKi: String {
+        let cleanKi = ki.replacingOccurrences(of: ".", with: "")
+        guard let value = Double(cleanKi) else { return "Ki: \(ki)" }
+        return "Ki: \(value.abbreviated)"
+    }
 }
