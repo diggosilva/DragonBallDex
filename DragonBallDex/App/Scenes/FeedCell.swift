@@ -75,6 +75,7 @@ final class FeedCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         charImage.image = nil
+        charImage.contentMode = .scaleAspectFit
         charNameLabel.text = nil
         charRaceLabel.text = nil
         charKiLabel.text = nil
@@ -110,9 +111,12 @@ final class FeedCell: UICollectionViewCell {
     
     func configure(char: Char) {
         guard let url = URL(string: char.image) else { return }
-        
-        charImage.sd_setImage(with: url) { [weak self] image, _, _, _ in
-            guard let self = self, let image = image else { return }
+
+        charImage.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholder")) { [weak self] image, _, _, _ in
+            guard let self = self, let image = image else {
+                self?.charImage.contentMode = .scaleAspectFill
+                return
+            }
             
             image.getColors { colors in
                 DispatchQueue.main.async {
@@ -123,6 +127,6 @@ final class FeedCell: UICollectionViewCell {
         
         charNameLabel.text = char.name
         charRaceLabel.text = char.race
-        charKiLabel.text =  "Ki: \(char.ki)"
+        charKiLabel.text = char.formattedKi
     }
 }
