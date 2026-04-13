@@ -43,7 +43,9 @@ class FeedViewController: UIViewController {
     }
     
     private func handleStates() {
-        viewModel.statePublisher.sink { [weak self] state in
+        viewModel.statePublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
             guard let self = self else { return }
             switch state {
             case .idle: break
