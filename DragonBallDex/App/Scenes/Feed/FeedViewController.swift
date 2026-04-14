@@ -106,6 +106,12 @@ extension FeedViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("Clicou em: \(indexPath.row)")
     }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if indexPath.item == viewModel.numberOfItems() - 1 {
+            viewModel.getCharacters()
+        }
+    }
 }
 
 // MARK: Actions

@@ -13,6 +13,8 @@ final class FeedCell: UICollectionViewCell {
     
     static let identifier: String = "FeedCell"
     
+    private var currentRepresentedIdentifier: Int?
+    
     lazy var charImage: UIImageView = {
         let image = UIImageView()
         image.translatesAutoresizingMaskIntoConstraints = false
@@ -74,8 +76,9 @@ final class FeedCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        currentRepresentedIdentifier = nil
+        charImage.sd_cancelCurrentImageLoad()
         charImage.image = nil
-        charImage.contentMode = .scaleAspectFit
         charNameLabel.text = nil
         charRaceLabel.text = nil
         charKiLabel.text = nil
@@ -110,23 +113,29 @@ final class FeedCell: UICollectionViewCell {
     }
     
     func configure(char: Char) {
+        // 1. Define o ID atual desta configuração
+        currentRepresentedIdentifier = char.id
+        
         guard let url = URL(string: char.image) else { return }
-
-        charImage.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholder")) { [weak self] image, _, _, _ in
-            guard let self = self, let image = image else {
-                self?.charImage.contentMode = .scaleAspectFill
-                return
-            }
-            
-            image.getColors { colors in
-                DispatchQueue.main.async {
-                    self.contentView.backgroundColor = colors?.secondary.withAlphaComponent(0.5)
-                }
-            }
-        }
         
         charNameLabel.text = char.name
         charRaceLabel.text = char.race
         charKiLabel.text = char.formattedKi
+        
+        charImage.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholder")) { [weak self] image, _, _, _ in
+            guard let self = self, let image = image else { return }
+            
+            // 2. Inicia a extração de cores (Processo pesado)
+            image.getColors { [weak self] colors in
+                DispatchQueue.main.async {
+                    // 3. Só aplica a cor se o ID da célula ainda for o mesmo do início da função
+                    if self?.currentRepresentedIdentifier == char.id {
+                        UIView.animate(withDuration: 0.3) {
+                            self?.contentView.backgroundColor = colors?.secondary.withAlphaComponent(0.5)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

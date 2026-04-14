@@ -7,16 +7,10 @@
 
 import Foundation
 
-protocol ServiceProtocol {
-    func getCharacters() async throws -> [Char]
-}
-
 final class Service: ServiceProtocol {
     
-    let baseURL = "https://dragonball-api.com/api"
-    
-    func getCharacters() async throws -> [Char] {
-        guard let url = URL(string: "\(baseURL)/characters") else { throw URLError(.badURL) }
+    func getCharacters(page: Int) async throws -> CharResponse {
+        guard let url = DragonBallEndpoint.characters(page: page).url else { throw URLError(.badURL) }
         
         let (data, response) = try await URLSession.shared.data(from: url)
         
@@ -24,6 +18,6 @@ final class Service: ServiceProtocol {
         
         let charResponse = try JSONDecoder().decode(CharResponse.self, from: data)
         
-        return charResponse.items.map({ $0.toDomain() })
+        return charResponse
     }
 }

@@ -9,6 +9,7 @@ import Foundation
 
 struct CharResponse: Codable {
     var items: [Item]
+    let meta: Meta
 }
 
 struct Item: Codable {
@@ -21,6 +22,14 @@ struct Item: Codable {
     let description: String
     let image: String
     let affiliation: String
+}
+
+struct Meta: Codable {
+    let totalItems: Int
+    let itemCount: Int
+    let itemsPerPage: Int
+    let totalPages: Int
+    let currentPage: Int
 }
 
 extension Item {
