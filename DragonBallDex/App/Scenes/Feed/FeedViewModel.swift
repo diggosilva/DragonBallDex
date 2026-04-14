@@ -25,6 +25,10 @@ protocol FeedViewModelProtocol: StatefulViewModel where State == FeedVCState {
 final class FeedViewModel: FeedViewModelProtocol {
     
     private var chars: [Char] = []
+    private var currentPage = 1
+    private var totalPages: Int?
+    private var isFetching: Bool = false
+    
     private let service: ServiceProtocol
     
     init(service: ServiceProtocol) {
@@ -46,14 +50,31 @@ final class FeedViewModel: FeedViewModelProtocol {
     }
     
     func getCharacters() {
+        // 1. Evita chamadas se já estiver carregando ou se já chegou no fim
+        guard !isFetching else { return }
+        if let total = totalPages, currentPage > total { return }
+        
+        isFetching = true
+        
         Task {
             do {
-                state = .loading
-                chars = try await service.getCharacters()
+                if currentPage == 1 { state = .loading }
+                
+                // 2. Passa a página atual para o Service
+                let response = try await service.getCharacters(page: currentPage)
+                
+                // 3. Acumula os personagens em vez de substituir
+                let newChars = response.items.map({ $0.toDomain() })
+                self.chars.append(contentsOf: newChars)
+                self.totalPages = response.meta.totalPages
+                self.currentPage += 1
+                
                 state = .loaded
+                isFetching = false
             } catch {
                 print("Erro ao carregar os dados: \(error.localizedDescription)")
                 state = .error
+                isFetching = false
             }
         }
     }
