@@ -76,10 +76,8 @@ final class FeedCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        // 2. Reseta o ID para invalidar qualquer processo assíncrono antigo
         currentRepresentedIdentifier = nil
-        
-        charImage.sd_cancelCurrentImageLoad() // Força o cancelamento do SDWebImage
+        charImage.sd_cancelCurrentImageLoad()
         charImage.image = nil
         charNameLabel.text = nil
         charRaceLabel.text = nil
@@ -115,7 +113,7 @@ final class FeedCell: UICollectionViewCell {
     }
     
     func configure(char: Char) {
-        // 3. Define o ID atual desta configuração
+        // 1. Define o ID atual desta configuração
         currentRepresentedIdentifier = char.id
         
         guard let url = URL(string: char.image) else { return }
@@ -127,10 +125,10 @@ final class FeedCell: UICollectionViewCell {
         charImage.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholder")) { [weak self] image, _, _, _ in
             guard let self = self, let image = image else { return }
             
-            // 4. Inicia a extração de cores (Processo pesado)
+            // 2. Inicia a extração de cores (Processo pesado)
             image.getColors { [weak self] colors in
                 DispatchQueue.main.async {
-                    // 5. A MÁGICA: Só aplica a cor se o ID da célula ainda for o mesmo do início da função
+                    // 3. Só aplica a cor se o ID da célula ainda for o mesmo do início da função
                     if self?.currentRepresentedIdentifier == char.id {
                         UIView.animate(withDuration: 0.3) {
                             self?.contentView.backgroundColor = colors?.secondary.withAlphaComponent(0.5)
