@@ -104,7 +104,10 @@ extension FeedViewController: UICollectionViewDataSource {
 
 extension FeedViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("Clicou em: \(indexPath.row)")
+        let char = viewModel.charForItem(at: indexPath.item)
+        let viewModel = DetailsViewModel(char: char)
+        let detailsVC = DetailsViewController(viewModel: viewModel)
+        navigationController?.pushViewController(detailsVC, animated: true)
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
