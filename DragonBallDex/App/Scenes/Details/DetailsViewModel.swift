@@ -6,3 +6,16 @@
 //
 
 import Foundation
+
+protocol DetailsViewModelProtocol {
+    var char: Char { get }
+}
+
+final class DetailsViewModel: DetailsViewModelProtocol {
+    
+    let char: Char
+    
+    init(char: Char) {
+        self.char = char
+    }
+}
