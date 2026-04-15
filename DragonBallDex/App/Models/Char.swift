@@ -23,4 +23,16 @@ struct Char: Codable {
         guard let value = Double(cleanKi) else { return "Ki: \(ki)" }
         return "Ki: \(value.abbreviated)"
     }
+    
+    var formattedKiDetails: String {
+        let cleanKi = ki.replacingOccurrences(of: ".", with: "")
+        guard let value = Double(cleanKi) else { return ki }
+        return "\(value.abbreviated)"
+    }
+    
+    var formattedMaxKiDetails: String {
+        let cleanKi = maxKi.replacingOccurrences(of: ".", with: "")
+        guard let value = Double(cleanKi) else { return maxKi }
+        return "\(value.abbreviated)"
+    }
 }
