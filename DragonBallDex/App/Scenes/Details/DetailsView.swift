@@ -208,7 +208,7 @@ final class DetailsView: UIView {
         nameLabel.text = char.name
         raceLabel.text = "Race: \(char.race) - \(char.gender)"
         descriptionLabel.text = char.description
-        kiLabelValue.text =  char.formattedKiDetails
+        kiLabelValue.text = char.formattedKiDetails
         maxKiLabelValue.text = char.formattedMaxKiDetails
     }
 }
