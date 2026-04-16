@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import Hero
 
 class FeedViewController: UIViewController {
     
@@ -35,6 +36,7 @@ class FeedViewController: UIViewController {
     
     private func setupNavigationBar() {
         navigationItem.title = "Dragon Ball"
+        navigationController?.hero.isEnabled = true
     }
     
     private func setupDataSourcesAndDelegates() {
@@ -46,14 +48,14 @@ class FeedViewController: UIViewController {
         viewModel.statePublisher
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
-            guard let self = self else { return }
-            switch state {
-            case .idle: break
-            case .loading: return showLoadingState()
-            case .loaded:  return showLoadedState()
-            case .error:   return showErrorState()
-            }
-        }.store(in: &cancellables)
+                guard let self = self else { return }
+                switch state {
+                case .idle: break
+                case .loading: return showLoadingState()
+                case .loaded:  return showLoadedState()
+                case .error:   return showErrorState()
+                }
+            }.store(in: &cancellables)
     }
     
     private func showLoadingState() {
@@ -107,6 +109,8 @@ extension FeedViewController: UICollectionViewDelegate {
         let char = viewModel.charForItem(at: indexPath.item)
         let viewModel = DetailsViewModel(char: char)
         let detailsVC = DetailsViewController(viewModel: viewModel)
+        
+        detailsVC.hero.isEnabled = true
         navigationController?.pushViewController(detailsVC, animated: true)
     }
     
