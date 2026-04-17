@@ -44,6 +44,14 @@ final class DetailsView: UIView {
         return label
     }()
     
+    lazy var affiliationLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .systemFont(ofSize: 16, weight: .regular)
+        label.textColor = .secondaryLabel
+        return label
+    }()
+    
     lazy var divider: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -147,6 +155,7 @@ final class DetailsView: UIView {
         containerView.addSubview(charImage)
         containerView.addSubview(nameLabel)
         containerView.addSubview(raceLabel)
+        containerView.addSubview(affiliationLabel)
         containerView.addSubview(divider)
         containerView.addSubview(descriptionLabelTitle)
         containerView.addSubview(descriptionLabel)
@@ -177,9 +186,13 @@ final class DetailsView: UIView {
             raceLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
             raceLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
             
-            divider.topAnchor.constraint(equalTo: raceLabel.bottomAnchor, constant: 16),
-            divider.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
-            divider.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
+            affiliationLabel.topAnchor.constraint(equalTo: raceLabel.bottomAnchor),
+            affiliationLabel.leadingAnchor.constraint(equalTo: raceLabel.leadingAnchor),
+            affiliationLabel.trailingAnchor.constraint(equalTo: raceLabel.trailingAnchor),
+            
+            divider.topAnchor.constraint(equalTo: affiliationLabel.bottomAnchor, constant: 16),
+            divider.leadingAnchor.constraint(equalTo: affiliationLabel.leadingAnchor),
+            divider.trailingAnchor.constraint(equalTo: affiliationLabel.trailingAnchor),
             divider.heightAnchor.constraint(equalToConstant: 1),
             
             descriptionLabelTitle.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 16),
@@ -207,6 +220,7 @@ final class DetailsView: UIView {
         charImage.sd_setImage(with: url)
         nameLabel.text = char.name
         raceLabel.text = "Race: \(char.race) - \(char.gender)"
+        affiliationLabel.text = "Afiliação: \(char.affiliation)"
         descriptionLabel.text = char.description
         kiLabelValue.text = char.formattedKiDetails
         maxKiLabelValue.text = char.formattedMaxKiDetails
