@@ -22,6 +22,7 @@ struct Item: Codable {
     let description: String
     let image: String
     let affiliation: String
+    let transformations: [Char.Transformation]
 }
 
 struct Meta: Codable {
@@ -43,7 +44,8 @@ extension Item {
             gender: gender,
             description: description,
             image: image,
-            affiliation: affiliation
+            affiliation: affiliation,
+            transformations: transformations
         )
     }
 }

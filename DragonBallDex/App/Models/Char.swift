@@ -17,7 +17,23 @@ struct Char: Codable {
     let description: String
     let image: String
     let affiliation: String
+    let transformations: [Transformation]
     
+    struct Transformation: Codable {
+        let id: Int
+        let name: String
+        let image: String
+        let ki: String
+        
+        var formattedKi: String {
+            let cleanKi = ki.replacingOccurrences(of: ".", with: "")
+            guard let value = Double(cleanKi) else { return ki }
+            return value.abbreviated
+        }
+    }
+}
+
+extension Char {
     var formattedKi: String {
         let cleanKi = ki.replacingOccurrences(of: ".", with: "")
         guard let value = Double(cleanKi) else { return "Ki: \(ki)" }

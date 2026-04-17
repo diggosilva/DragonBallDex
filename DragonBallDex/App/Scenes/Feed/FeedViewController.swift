@@ -106,7 +106,13 @@ extension FeedViewController: UICollectionViewDataSource {
 
 extension FeedViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? FeedCell else { return }
         let char = viewModel.charForItem(at: indexPath.item)
+        
+        let transitionID = "char_image_\(char.id)"
+        
+        cell.charImage.hero.id = transitionID
+        
         let viewModel = DetailsViewModel(char: char)
         let detailsVC = DetailsViewController(viewModel: viewModel)
         
