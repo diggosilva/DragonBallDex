@@ -10,58 +10,55 @@ import SDWebImage
 
 final class DetailsView: UIView {
     
+    private var transformations: [Char.Transformation] = []
+    
+    // MARK: - UI Components
     lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.translatesAutoresizingMaskIntoConstraints = false
         return scroll
     }()
     
-    lazy var containerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var mainStack: UIStackView = {
+        let stack = UIStackView()
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = 16
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 20, right: 16)
+        return stack
     }()
     
     lazy var charImage: UIImageView = {
         let image = UIImageView()
-        image.translatesAutoresizingMaskIntoConstraints = false
         image.contentMode = .scaleAspectFit
+        image.heightAnchor.constraint(equalToConstant: 300).isActive = true
         return image
     }()
     
     lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 32, weight: .bold)
         return label
     }()
     
-    lazy var raceLabel: UILabel = {
+    lazy var infoLabel: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 24, weight: .regular)
-        label.textColor = .secondaryLabel
-        return label
-    }()
-    
-    lazy var affiliationLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 16, weight: .regular)
         label.textColor = .secondaryLabel
+        label.numberOfLines = 0
         return label
     }()
     
     lazy var divider: UIView = {
         let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .systemGray4
+        view.heightAnchor.constraint(equalToConstant: 1).isActive = true
         return view
     }()
     
     lazy var descriptionLabelTitle: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.text = "Descrição:"
         return label
@@ -69,72 +66,67 @@ final class DetailsView: UIView {
     
     lazy var descriptionLabel: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 16, weight: .regular)
         label.numberOfLines = 0
         label.textAlignment = .justified
         return label
     }()
     
-    lazy var kiLabelTitle: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 16, weight: .bold)
-        label.text = "Ki Total"
-        label.textAlignment = .left
-        return label
-    }()
-    
+    // Stats (Ki)
     lazy var kiLabelValue: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 16, weight: .bold)
         label.textColor = .systemOrange
         label.textAlignment = .right
-        return label
-    }()
-    
-    lazy var kiStatStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [kiLabelTitle, kiLabelValue])
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.axis = .horizontal
-        stack.distribution = .fillEqually
-        return stack
-    }()
-    
-    lazy var maxKiLabelTitle: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 16, weight: .bold)
-        label.text = "Max Ki"
-        label.textAlignment = .left
         return label
     }()
     
     lazy var maxKiLabelValue: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 16, weight: .bold)
         label.textColor = .systemOrange
         label.textAlignment = .right
         return label
     }()
     
-    lazy var maxKiStatStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [maxKiLabelTitle, maxKiLabelValue])
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.axis = .horizontal
-        stack.distribution = .fillEqually
-        return stack
-    }()
-    
-    lazy var vStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [kiStatStack, maxKiStatStack])
-        stack.translatesAutoresizingMaskIntoConstraints = false
+    lazy var statsStack: UIStackView = {
+        let stack = UIStackView()
         stack.axis = .vertical
+        stack.spacing = 8
         return stack
     }()
     
+    // Transformações
+    lazy var transformationsSection: UIStackView = {
+        let divider = UIView()
+        divider.backgroundColor = .systemGray4
+        divider.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        
+        let title = UILabel()
+        title.text = "Transformações"
+        title.font = .systemFont(ofSize: 20, weight: .bold)
+        
+        let stack = UIStackView(arrangedSubviews: [divider, title, collectionView])
+        stack.axis = .vertical
+        stack.spacing = 12
+        return stack
+    }()
+    
+    lazy var collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 100, height: 140)
+        layout.minimumLineSpacing = 16
+        
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.backgroundColor = .clear
+        cv.showsHorizontalScrollIndicator = false
+        cv.heightAnchor.constraint(equalToConstant: 180).isActive = true
+        cv.register(TransformationCell.self, forCellWithReuseIdentifier: TransformationCell.identifier)
+        return cv
+    }()
+    
+    // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -143,86 +135,70 @@ final class DetailsView: UIView {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
     private func setupView() {
-        setupHierarchy()
-        setupConstraints()
-        setupConfigurations()
-    }
-    
-    private func setupHierarchy() {
-        addSubview(scrollView)
-        scrollView.addSubview(containerView)
+        backgroundColor = .secondarySystemBackground
         
-        containerView.addSubview(charImage)
-        containerView.addSubview(nameLabel)
-        containerView.addSubview(raceLabel)
-        containerView.addSubview(affiliationLabel)
-        containerView.addSubview(divider)
-        containerView.addSubview(descriptionLabelTitle)
-        containerView.addSubview(descriptionLabel)
-        containerView.addSubview(vStack)
-    }
-    
-    private func setupConstraints() {
+        addSubview(scrollView)
+        scrollView.addSubview(mainStack)
+        
+        // Montando as linhas de Ki
+        statsStack.addArrangedSubview(createStatRow(title: "Ki Total", valueLabel: kiLabelValue))
+        statsStack.addArrangedSubview(createStatRow(title: "Max Ki", valueLabel: maxKiLabelValue))
+        
+        // Ordem da Main Stack
+        mainStack.addArrangedSubview(charImage)
+        mainStack.addArrangedSubview(nameLabel)
+        mainStack.addArrangedSubview(infoLabel)
+        mainStack.addArrangedSubview(divider)
+        mainStack.addArrangedSubview(descriptionLabelTitle)
+        mainStack.addArrangedSubview(descriptionLabel)
+        mainStack.addArrangedSubview(statsStack)
+        mainStack.addArrangedSubview(transformationsSection)
+        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            containerView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            containerView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor),
-            containerView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            
-            charImage.topAnchor.constraint(equalTo: containerView.topAnchor),
-            charImage.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            charImage.heightAnchor.constraint(equalToConstant: 300),
-            
-            nameLabel.topAnchor.constraint(equalTo: charImage.bottomAnchor, constant: 16),
-            nameLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            nameLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            
-            raceLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 16),
-            raceLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
-            raceLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
-            
-            affiliationLabel.topAnchor.constraint(equalTo: raceLabel.bottomAnchor),
-            affiliationLabel.leadingAnchor.constraint(equalTo: raceLabel.leadingAnchor),
-            affiliationLabel.trailingAnchor.constraint(equalTo: raceLabel.trailingAnchor),
-            
-            divider.topAnchor.constraint(equalTo: affiliationLabel.bottomAnchor, constant: 16),
-            divider.leadingAnchor.constraint(equalTo: affiliationLabel.leadingAnchor),
-            divider.trailingAnchor.constraint(equalTo: affiliationLabel.trailingAnchor),
-            divider.heightAnchor.constraint(equalToConstant: 1),
-            
-            descriptionLabelTitle.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 16),
-            descriptionLabelTitle.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
-            descriptionLabelTitle.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
-            
-            descriptionLabel.topAnchor.constraint(equalTo: descriptionLabelTitle.bottomAnchor, constant: 16),
-            descriptionLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
-            descriptionLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
-            
-            vStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 16),
-            vStack.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
-            vStack.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
-            vStack.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
+            mainStack.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            mainStack.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            mainStack.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            mainStack.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            mainStack.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor)
         ])
     }
     
-    private func setupConfigurations() {
-        backgroundColor = .secondarySystemBackground
+    private func createStatRow(title: String, valueLabel: UILabel) -> UIStackView {
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = .systemFont(ofSize: 16, weight: .bold)
+        
+        let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel])
+        stack.axis = .horizontal
+        stack.distribution = .fillEqually
+        return stack
     }
     
+    // MARK: - Configuration
     func configure(char: Char) {
         guard let url = URL(string: char.image) else { return }
         
         charImage.sd_setImage(with: url)
         nameLabel.text = char.name
-        raceLabel.text = "Race: \(char.race) - \(char.gender)"
-        affiliationLabel.text = "Afiliação: \(char.affiliation)"
+        infoLabel.text = "Raça: \(char.race) - \(char.gender)\nAfiliação: \(char.affiliation)"
         descriptionLabel.text = char.description
         kiLabelValue.text = char.formattedKiDetails
         maxKiLabelValue.text = char.formattedMaxKiDetails
+        
+        self.transformations = char.transformations
+        
+        // Se estiver vazio, a seção some e a mainStack colapsa o espaço
+        let hasTransformations = !char.transformations.isEmpty
+        transformationsSection.isHidden = !hasTransformations
+        
+        if hasTransformations {
+            collectionView.reloadData()
+        }
+        self.layoutIfNeeded()
     }
 }
