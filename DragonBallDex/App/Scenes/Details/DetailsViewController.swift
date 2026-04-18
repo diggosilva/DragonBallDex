@@ -11,7 +11,7 @@ import Hero
 class DetailsViewController: UIViewController {
     
     private let contentView = DetailsView()
-    private let viewModel: DetailsViewModelProtocol
+    private var viewModel: DetailsViewModelProtocol
     
     init(viewModel: DetailsViewModelProtocol) {
         self.viewModel = viewModel
@@ -29,12 +29,9 @@ class DetailsViewController: UIViewController {
         self.hero.isEnabled = true
         setupData()
         setupNavigationBar()
-    }
-    
-    private func setupNavigationBar() {
-        let char = viewModel.char
-        contentView.configure(char: char)
-        navigationItem.title = char.name
+        setupDataSourcesAndDelegates()
+        bindViewModel()
+        viewModel.fetchDetails()
     }
     
     private func setupData() {
@@ -43,5 +40,44 @@ class DetailsViewController: UIViewController {
         contentView.charImage.hero.id = "char_image_\(String(char.id))"
         contentView.charImage.hero.modifiers = [.arc, .spring(stiffness: 250, damping: 25)]
         view.hero.modifiers = [.cascade]
+    }
+    
+    private func setupNavigationBar() {
+        let char = viewModel.char
+        contentView.configure(char: char)
+        navigationItem.title = char.name
+    }
+    
+    private func setupDataSourcesAndDelegates() {
+        contentView.collectionView.dataSource = self
+        contentView.collectionView.delegate = self
+    }
+    
+    private func bindViewModel() {
+        viewModel.onDataUpdate = { [weak self] fullChar in
+            self?.contentView.configure(char: fullChar)
+        }
+    }
+}
+
+extension DetailsViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return viewModel.char.transformations.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TransformationCell.identifier, for: indexPath) as? TransformationCell else {
+            return UICollectionViewCell()
+        }
+        
+        cell.configure(with: viewModel.char.transformations[indexPath.item])
+        
+        return cell
+    }
+}
+
+extension DetailsViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
     }
 }
