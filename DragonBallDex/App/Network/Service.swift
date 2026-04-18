@@ -20,4 +20,12 @@ final class Service: ServiceProtocol {
         
         return charResponse
     }
+    
+    func getCharacterDetails(id: Int) async throws -> Char {
+        guard let url = DragonBallEndpoint.details(id: id).url else { throw URLError(.badURL) }
+        
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let item = try JSONDecoder().decode(Item.self, from: data)
+        return item.toDomain()
+    }
 }
