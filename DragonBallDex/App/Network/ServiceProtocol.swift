@@ -9,4 +9,5 @@ import Foundation
 
 protocol ServiceProtocol {
     func getCharacters(page: Int) async throws -> CharResponse
+    func getCharacterDetails(id: Int) async throws -> Char
 }
