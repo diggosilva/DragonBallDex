@@ -78,6 +78,31 @@ extension DetailsViewController: UICollectionViewDataSource {
 
 extension DetailsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: indexPath, animated: true)
+        let transformation = viewModel.char.transformations[indexPath.item]
+        updateCharacterData(with: transformation)
+    }
+    
+    private func updateCharacterData(with transformation: Char.Transformation) {
+        let char = viewModel.char
+        
+        let transformedChar = Char(
+            id: char.id,
+            name: transformation.name,
+            ki: transformation.ki,
+            maxKi: char.maxKi,
+            race: char.race,
+            gender: char.gender,
+            description: "Transformação de \(char.name)",
+            image: transformation.image,
+            affiliation: char.affiliation,
+            transformations: char.transformations
+        )
+        
+        UIView.transition(with: contentView, duration: 0.3, options: .transitionCrossDissolve) {
+            self.contentView.configure(char: transformedChar)
+            self.navigationItem.title = transformedChar.name
+        }
+        
+        contentView.scrollView.setContentOffset(.zero, animated: true)
     }
 }
