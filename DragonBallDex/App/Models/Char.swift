@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Char: Codable {
+struct Char: Codable, Hashable {
     let id: Int
     let name: String
     let ki: String
@@ -19,7 +19,7 @@ struct Char: Codable {
     let affiliation: String
     let transformations: [Transformation]
     
-    struct Transformation: Codable {
+    struct Transformation: Codable, Hashable {
         let id: Int
         let name: String
         let image: String
@@ -30,6 +30,14 @@ struct Char: Codable {
             guard let value = Double(cleanKi) else { return ki }
             return value.abbreviated
         }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: Char, rhs: Char) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name && lhs.ki == rhs.ki
     }
 }
 

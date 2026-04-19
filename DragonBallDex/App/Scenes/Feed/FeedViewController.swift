@@ -11,6 +11,8 @@ import Hero
 
 class FeedViewController: UIViewController {
     
+    private var collectionDataSource: UICollectionViewDiffableDataSource<Int, String>?
+    
     private let contentView = FeedView()
     private let viewModel: any FeedViewModelProtocol
     private var cancellables = Set<AnyCancellable>()
@@ -29,6 +31,7 @@ class FeedViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigationBar()
+        configureCollectionDataSource()
         setupDataSourcesAndDelegates()
         handleStates()
         viewModel.getCharacters()
@@ -40,7 +43,6 @@ class FeedViewController: UIViewController {
     }
     
     private func setupDataSourcesAndDelegates() {
-        contentView.collectionView.dataSource = self
         contentView.collectionView.delegate = self
     }
     
@@ -64,12 +66,32 @@ class FeedViewController: UIViewController {
     
     private func showLoadedState() {
         contentView.spinner.stopAnimating()
-        contentView.collectionView.reloadData()
+        applyCollectionSnapshot()
     }
     
     private func showErrorState() {
         showErrorAlert(title: "Ops! ⚠️", message: "Erro ao carregar os personagens. Tente novamente mais tarde.")
         contentView.spinner.stopAnimating()
+    }
+    
+    private func configureCollectionDataSource() {
+        collectionDataSource = UICollectionViewDiffableDataSource(collectionView: contentView.collectionView, cellProvider: { [weak self] collectionView, indexPath, itemId in
+            guard let self = self,
+                  let char = viewModel.getChars().first(where: { String($0.id) == itemId }),
+                  let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedCell.identifier, for: indexPath) as? FeedCell else { return UICollectionViewCell() }
+            
+            cell.configure(char: char)
+            return cell
+        })
+    }
+    
+    private func applyCollectionSnapshot(animated: Bool = true) {
+        var snapshot = NSDiffableDataSourceSnapshot<Int, String>()
+        snapshot.appendSections([0])
+        
+        let ids = viewModel.getChars().map({ String($0.id) })
+        snapshot.appendItems(ids)
+        collectionDataSource?.apply(snapshot, animatingDifferences: animated)
     }
 }
 
@@ -88,19 +110,6 @@ extension FeedViewController: UICollectionViewDelegateFlowLayout {
         let width = floor(rawWidth)
         
         return CGSize(width: width, height: width * 1.5)
-    }
-}
-
-extension FeedViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.numberOfItems()
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedCell.identifier, for: indexPath) as? FeedCell else { return UICollectionViewCell() }
-        let char = viewModel.charForItem(at: indexPath.item)
-        cell.configure(char: char)
-        return cell
     }
 }
 
@@ -138,3 +147,77 @@ extension FeedViewController {
         present(alert, animated: true)
     }
 }
+
+
+
+
+// MARK: - Diffable Data Source & Snapshots Template (Swift 6 + MVVM + Combine)
+
+import UIKit
+import Combine
+
+// MARK: - Properties
+
+private var collectionDataSource: UICollectionViewDiffableDataSource<Int, String>?
+private var cancellables = Set<AnyCancellable>()
+
+// MARK: - Configure CollectionView Diffable DataSource
+
+//private func configureCollectionDataSource() {
+//    collectionDataSource = UICollectionViewDiffableDataSource<Int, String>(
+//        collectionView: collectionView
+//    ) { [weak self] collectionView, indexPath, itemID in
+//        guard
+//            let self,
+//            let model = self.viewModel.getItems().first(where: { String($0.id) == itemID }),
+//            let cell = collectionView.dequeueReusableCell(
+//                withReuseIdentifier: CustomCollectionCell.identifier,
+//                for: indexPath
+//            ) as? CustomCollectionCell
+//        else { return UICollectionViewCell() }
+//        
+//        cell.configure(with: model)
+//        return cell
+//    }
+//}
+
+// MARK: - Apply Collection Snapshot
+
+//private func applyCollectionSnapshot(animated: Bool = true) {
+//    var snapshot = NSDiffableDataSourceSnapshot<Int, String>()
+//    snapshot.appendSections([0])
+//    snapshot.appendItems(viewModel.getItems().map { String($0.id) })
+//    collectionDataSource?.apply(snapshot, animatingDifferences: animated)
+//}
+
+// MARK: - Bind ViewModel with Combine
+
+//private func bindViewModel() {
+//    // State-driven UI (loading / loaded / error)
+//    viewModel.statePublisher
+//        .receive(on: RunLoop.main)
+//        .sink { [weak self] state in
+//            guard let self = self else { return }
+//            switch state {
+//            case .idle:
+//                break
+//            case .loading:
+//                spinner.startAnimating()
+//            case .loaded:
+//                spinner.stopAnimating()
+//                applyCollectionSnapshot()  // CollectionView snapshot
+//            case .error(let message):
+//                spinner.stopAnimating()
+//                showErrorAlert(message: message)
+//            }
+//        }
+//        .store(in: &cancellables)
+//    
+//    // Optional: automatic snapshot on data change (search / filter)
+//    viewModel.itemsPublisher
+//        .receive(on: RunLoop.main)
+//        .sink { [weak self] _ in
+//            self?.applyCollectionSnapshot()
+//        }
+//        .store(in: &cancellables)
+//}
