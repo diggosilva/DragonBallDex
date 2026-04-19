@@ -19,6 +19,7 @@ protocol FeedViewModelProtocol: StatefulViewModel where State == FeedVCState {
     func numberOfItems() -> Int
     func charForItem(at index: Int) -> Char
     func getCharacters()
+    func getChars() -> [Char]
 }
 
 @MainActor
@@ -77,5 +78,9 @@ final class FeedViewModel: FeedViewModelProtocol {
                 isFetching = false
             }
         }
+    }
+    
+    func getChars() -> [Char] {
+        return chars
     }
 }
