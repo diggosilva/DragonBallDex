@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Hero
 
 class DetailsViewController: UIViewController {
     
@@ -26,7 +25,6 @@ class DetailsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.hero.isEnabled = true
         setupData()
         setupNavigationBar()
         setupDataSourcesAndDelegates()
@@ -37,9 +35,6 @@ class DetailsViewController: UIViewController {
     private func setupData() {
         let char = viewModel.char
         contentView.configure(char: char)
-        contentView.charImage.hero.id = "char_image_\(String(char.id))"
-        contentView.charImage.hero.modifiers = [.arc, .spring(stiffness: 250, damping: 25)]
-        view.hero.modifiers = [.cascade]
     }
     
     private func setupNavigationBar() {
