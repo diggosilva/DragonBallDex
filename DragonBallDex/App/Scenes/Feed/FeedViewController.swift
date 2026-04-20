@@ -7,11 +7,11 @@
 
 import UIKit
 import Combine
-import Hero
 
 class FeedViewController: UIViewController {
     
     private var collectionDataSource: UICollectionViewDiffableDataSource<Int, String>?
+    private var searchController = UISearchController(searchResultsController: nil)
     
     private let contentView = FeedView()
     private let viewModel: any FeedViewModelProtocol
@@ -32,17 +32,25 @@ class FeedViewController: UIViewController {
         super.viewDidLoad()
         setupNavigationBar()
         configureCollectionDataSource()
-        setupDataSourcesAndDelegates()
+        configureCollectionDelegates()
         handleStates()
         viewModel.getCharacters()
     }
     
     private func setupNavigationBar() {
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Buscar guerreiros..."
+        
+        navigationItem.searchController = searchController
         navigationItem.title = "Dragon Ball"
-        navigationController?.hero.isEnabled = true
+        
+        definesPresentationContext = true
+        
+        contentView.collectionView.keyboardDismissMode = .onDrag
     }
     
-    private func setupDataSourcesAndDelegates() {
+    private func configureCollectionDelegates() {
         contentView.collectionView.delegate = self
     }
     
@@ -75,9 +83,8 @@ class FeedViewController: UIViewController {
     }
     
     private func configureCollectionDataSource() {
-        collectionDataSource = UICollectionViewDiffableDataSource(collectionView: contentView.collectionView, cellProvider: { [weak self] collectionView, indexPath, itemId in
-            guard let self = self,
-                  let char = viewModel.getChars().first(where: { String($0.id) == itemId }),
+        collectionDataSource = UICollectionViewDiffableDataSource<Int, String>(collectionView: contentView.collectionView, cellProvider: { [weak self] collectionView, indexPath, itemId in
+            guard let char = self?.viewModel.getChars().first(where: { String($0.id) == itemId }),
                   let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedCell.identifier, for: indexPath) as? FeedCell else { return UICollectionViewCell() }
             
             cell.configure(char: char)
@@ -115,22 +122,16 @@ extension FeedViewController: UICollectionViewDelegateFlowLayout {
 
 extension FeedViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? FeedCell else { return }
         let char = viewModel.charForItem(at: indexPath.item)
         
-        let transitionID = "char_image_\(char.id)"
+        let detailsVM = DetailsViewModel(char: char)
+        let detailsVC = DetailsViewController(viewModel: detailsVM)
         
-        cell.charImage.hero.id = transitionID
-        
-        let viewModel = DetailsViewModel(char: char)
-        let detailsVC = DetailsViewController(viewModel: viewModel)
-        
-        detailsVC.hero.isEnabled = true
         navigationController?.pushViewController(detailsVC, animated: true)
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if indexPath.item == viewModel.numberOfItems() - 1 {
+        if !viewModel.isSearching && indexPath.item == viewModel.numberOfItems() - 1 {
             viewModel.getCharacters()
         }
     }
@@ -148,76 +149,10 @@ extension FeedViewController {
     }
 }
 
-
-
-
-// MARK: - Diffable Data Source & Snapshots Template (Swift 6 + MVVM + Combine)
-
-import UIKit
-import Combine
-
-// MARK: - Properties
-
-private var collectionDataSource: UICollectionViewDiffableDataSource<Int, String>?
-private var cancellables = Set<AnyCancellable>()
-
-// MARK: - Configure CollectionView Diffable DataSource
-
-//private func configureCollectionDataSource() {
-//    collectionDataSource = UICollectionViewDiffableDataSource<Int, String>(
-//        collectionView: collectionView
-//    ) { [weak self] collectionView, indexPath, itemID in
-//        guard
-//            let self,
-//            let model = self.viewModel.getItems().first(where: { String($0.id) == itemID }),
-//            let cell = collectionView.dequeueReusableCell(
-//                withReuseIdentifier: CustomCollectionCell.identifier,
-//                for: indexPath
-//            ) as? CustomCollectionCell
-//        else { return UICollectionViewCell() }
-//        
-//        cell.configure(with: model)
-//        return cell
-//    }
-//}
-
-// MARK: - Apply Collection Snapshot
-
-//private func applyCollectionSnapshot(animated: Bool = true) {
-//    var snapshot = NSDiffableDataSourceSnapshot<Int, String>()
-//    snapshot.appendSections([0])
-//    snapshot.appendItems(viewModel.getItems().map { String($0.id) })
-//    collectionDataSource?.apply(snapshot, animatingDifferences: animated)
-//}
-
-// MARK: - Bind ViewModel with Combine
-
-//private func bindViewModel() {
-//    // State-driven UI (loading / loaded / error)
-//    viewModel.statePublisher
-//        .receive(on: RunLoop.main)
-//        .sink { [weak self] state in
-//            guard let self = self else { return }
-//            switch state {
-//            case .idle:
-//                break
-//            case .loading:
-//                spinner.startAnimating()
-//            case .loaded:
-//                spinner.stopAnimating()
-//                applyCollectionSnapshot()  // CollectionView snapshot
-//            case .error(let message):
-//                spinner.stopAnimating()
-//                showErrorAlert(message: message)
-//            }
-//        }
-//        .store(in: &cancellables)
-//    
-//    // Optional: automatic snapshot on data change (search / filter)
-//    viewModel.itemsPublisher
-//        .receive(on: RunLoop.main)
-//        .sink { [weak self] _ in
-//            self?.applyCollectionSnapshot()
-//        }
-//        .store(in: &cancellables)
-//}
+extension FeedViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let text = searchController.searchBar.text ?? ""
+        viewModel.search(text: text)
+        applyCollectionSnapshot()
+    }
+}
