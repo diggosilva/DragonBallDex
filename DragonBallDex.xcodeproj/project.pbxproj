@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		921D4A822F90354B0025F670 /* Hero in Frameworks */ = {isa = PBXBuildFile; productRef = 921D4A812F90354B0025F670 /* Hero */; };
 		92D1DDDE2F8BC1940091F08F /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 92D1DDDD2F8BC1940091F08F /* SDWebImage */; };
 /* End PBXBuildFile section */
 
@@ -41,7 +40,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				921D4A822F90354B0025F670 /* Hero in Frameworks */,
 				92D1DDDE2F8BC1940091F08F /* SDWebImage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -86,7 +84,6 @@
 			name = DragonBallDex;
 			packageProductDependencies = (
 				92D1DDDD2F8BC1940091F08F /* SDWebImage */,
-				921D4A812F90354B0025F670 /* Hero */,
 			);
 			productName = DragonBallDex;
 			productReference = 92AA63C22F71D7E000249504 /* DragonBallDex.app */;
@@ -118,7 +115,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				92D1DDDC2F8BC1940091F08F /* XCRemoteSwiftPackageReference "SDWebImage" */,
-				921D4A802F90354B0025F670 /* XCRemoteSwiftPackageReference "Hero" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 92AA63C32F71D7E000249504 /* Products */;
@@ -356,14 +352,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		921D4A802F90354B0025F670 /* XCRemoteSwiftPackageReference "Hero" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/HeroTransitions/Hero";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.6.4;
-			};
-		};
 		92D1DDDC2F8BC1940091F08F /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImage.git";
@@ -375,11 +363,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		921D4A812F90354B0025F670 /* Hero */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 921D4A802F90354B0025F670 /* XCRemoteSwiftPackageReference "Hero" */;
-			productName = Hero;
-		};
 		92D1DDDD2F8BC1940091F08F /* SDWebImage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 92D1DDDC2F8BC1940091F08F /* XCRemoteSwiftPackageReference "SDWebImage" */;
