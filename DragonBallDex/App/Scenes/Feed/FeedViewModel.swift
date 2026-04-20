@@ -20,15 +20,26 @@ protocol FeedViewModelProtocol: StatefulViewModel where State == FeedVCState {
     func charForItem(at index: Int) -> Char
     func getCharacters()
     func getChars() -> [Char]
+    func search(text: String)
+    
+    var isSearching: Bool { get }
 }
 
 @MainActor
 final class FeedViewModel: FeedViewModelProtocol {
     
     private var chars: [Char] = []
+    
+    private var filteredChars: [Char] = []
+    private var currentSearchText: String = ""
+    
     private var currentPage = 1
     private var totalPages: Int?
     private var isFetching: Bool = false
+    
+    var isSearching: Bool {
+        return !currentSearchText.isEmpty
+    }
     
     private let service: ServiceProtocol
     
@@ -43,11 +54,11 @@ final class FeedViewModel: FeedViewModelProtocol {
     }
     
     func numberOfItems() -> Int {
-        return chars.count
+        return filteredChars.count
     }
     
     func charForItem(at index: Int) -> Char {
-        return chars[index]
+        return filteredChars[index]
     }
     
     func getCharacters() {
@@ -67,6 +78,7 @@ final class FeedViewModel: FeedViewModelProtocol {
                 // 3. Acumula os personagens em vez de substituir
                 let newChars = response.items.map({ $0.toDomain() })
                 self.chars.append(contentsOf: newChars)
+                self.filteredChars = chars
                 self.totalPages = response.meta.totalPages
                 self.currentPage += 1
                 
@@ -81,6 +93,35 @@ final class FeedViewModel: FeedViewModelProtocol {
     }
     
     func getChars() -> [Char] {
-        return chars
+        return filteredChars
+    }
+    
+    func search(text: String) {
+        let normalized = normalize(text)
+        
+        guard currentSearchText != normalized else { return }
+        
+        currentSearchText = normalized
+        applyFilter()
+        
+        state = .loaded
+    }
+    
+    private func normalize(_ text: String) -> String {
+        return text
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    private func applyFilter() {
+        if currentSearchText.isEmpty {
+            filteredChars = chars
+        } else {
+            filteredChars = chars.filter {
+                normalize($0.name).contains(currentSearchText) ||
+                normalize($0.race).contains(currentSearchText)
+            }
+        }
     }
 }
