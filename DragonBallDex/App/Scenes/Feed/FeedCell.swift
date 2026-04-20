@@ -7,7 +7,6 @@
 
 import UIKit
 import SDWebImage
-import Hero
 
 final class FeedCell: UICollectionViewCell {
     
@@ -83,8 +82,6 @@ final class FeedCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        charImage.hero.id = nil
-        charImage.hero.modifiers = nil
         charImage.image = nil
         charNameLabel.text = nil
         charRaceLabel.text = nil
@@ -124,8 +121,5 @@ final class FeedCell: UICollectionViewCell {
         charNameLabel.text = char.name
         charRaceLabel.text = char.race
         charKiLabel.text = char.formattedKi
-        
-        charImage.hero.id = "char_image_\(String(char.id))"
-        charImage.hero.modifiers = [.arc(intensity: -1.5), .spring(stiffness: 250, damping: 25)]
     }
 }
