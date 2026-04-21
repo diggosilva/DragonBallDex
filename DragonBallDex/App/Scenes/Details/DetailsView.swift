@@ -94,7 +94,11 @@ final class DetailsView: UIView {
     lazy var statsStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 8
+        stack.layer.cornerRadius = 8
+        stack.backgroundColor = .tertiarySystemBackground
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
+        applyShadow(view: stack)
         return stack
     }()
     
