@@ -45,8 +45,7 @@ final class FeedView: UIView {
     }
     
     private func setupHierarchy() {
-        addSubview(collectionView)
-        addSubview(spinner)
+        addSubviews(collectionView, spinner)
     }
     
     private func setupConstraints() {

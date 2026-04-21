@@ -47,13 +47,6 @@ final class TransformationCell: UICollectionViewCell {
         applyShadow(view: self)
     }
     
-    func applyShadow(view: UIView) {
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOffset = CGSize(width: 3, height: 3)
-        view.layer.shadowOpacity = 0.3
-        view.layer.shadowRadius = 7.0
-    }
-    
     override func prepareForReuse() {
         super.prepareForReuse()
         charImage.image = nil
