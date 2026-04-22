@@ -25,11 +25,7 @@ final class FeedView: UIView {
         return collection
     }()
     
-    lazy var spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(style: .large)
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        return spinner
-    }()
+    lazy var spinner = buildSpinner()
     
     override init(frame: CGRect) {
         super.init(frame: frame)

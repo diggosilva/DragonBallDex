@@ -132,6 +132,8 @@ final class DetailsView: UIView {
         return cv
     }()
     
+    lazy var spinner = buildSpinner()
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -144,7 +146,7 @@ final class DetailsView: UIView {
         backgroundColor = .secondarySystemBackground
         
         addSubview(scrollView)
-        scrollView.addSubview(mainStack)
+        scrollView.addSubviews(mainStack, spinner)
         
         // Montando as linhas de Ki
         statsStack.addArrangedSubview(createStatRow(title: "Ki Total", valueLabel: kiLabelValue))
@@ -170,7 +172,10 @@ final class DetailsView: UIView {
             mainStack.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             mainStack.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             mainStack.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            mainStack.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor)
+            mainStack.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            
+            spinner.centerXAnchor.constraint(equalTo: centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
     }
     

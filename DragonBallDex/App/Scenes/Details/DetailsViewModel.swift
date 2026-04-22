@@ -6,35 +6,49 @@
 //
 
 import Foundation
+import Combine
 
-protocol DetailsViewModelProtocol {
+enum DetailsVCStates {
+    case idle
+    case loading
+    case loaded
+    case error
+}
+
+protocol DetailsViewModelProtocol: StatefulViewModel where State == DetailsVCStates {
     var char: Char { get }
-    var onDataUpdate: ((Char) -> Void)? { get set }
     
     func fetchDetails()
 }
 
+@MainActor
 final class DetailsViewModel: DetailsViewModelProtocol {
     
-    private(set) var char: Char
-    var onDataUpdate: ((Char) -> Void)?
+    @Published private(set) var char: Char
+    @Published private var state: DetailsVCStates = .idle
+    
+    var statePublisher: AnyPublisher<DetailsVCStates, Never> {
+        $state.eraseToAnyPublisher()
+    }
+    
     private let service: ServiceProtocol
     
-    init(char: Char, service: ServiceProtocol = Service()) {
+    init(char: Char, service: ServiceProtocol) {
         self.char = char
         self.service = service
     }
     
     func fetchDetails() {
+        state = .loading
+        
         Task {
             do {
                 let fullChar = try await service.getCharacterDetails(id: char.id)
                 self.char = fullChar
-                DispatchQueue.main.async {
-                    self.onDataUpdate?(fullChar)
-                }
+                state = .loaded
             } catch {
                 print("Erro ao carregar transformações: \(error.localizedDescription)")
+                state = .error
             }
         }
     }

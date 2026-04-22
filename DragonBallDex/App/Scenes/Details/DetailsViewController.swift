@@ -6,35 +6,34 @@
 //
 
 import UIKit
+import Combine
 
 class DetailsViewController: UIViewController {
     
     private let contentView = DetailsView()
-    private var viewModel: DetailsViewModelProtocol
+    private var viewModel: any DetailsViewModelProtocol
+    private var cancellables = Set<AnyCancellable>()
     
-    init(viewModel: DetailsViewModelProtocol) {
+    init(viewModel: any DetailsViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
-    override func loadView() {
-        view = contentView
-    }
+    override func loadView() { view = contentView }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupData()
         setupNavigationBar()
         setupDataSourcesAndDelegates()
-        bindViewModel()
+        handleStates()
         viewModel.fetchDetails()
     }
     
     private func setupData() {
-        let char = viewModel.char
-        contentView.configure(char: char)
+        contentView.configure(char: viewModel.char)
     }
     
     private func setupNavigationBar() {
@@ -48,10 +47,32 @@ class DetailsViewController: UIViewController {
         contentView.collectionView.delegate = self
     }
     
-    private func bindViewModel() {
-        viewModel.onDataUpdate = { [weak self] fullChar in
-            self?.contentView.configure(char: fullChar)
-        }
+    private func handleStates() {
+        viewModel.statePublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                guard let self = self else { return }
+                
+                switch state {
+                case .idle: break
+                case .loading: showLoadingState()
+                case .loaded: showLoadedState()
+                case .error: showErrorState()
+                }
+            }.store(in: &cancellables)
+    }
+    
+    private func showLoadingState() {
+        contentView.spinner.startAnimating()
+    }
+    
+    private func showLoadedState() {
+        contentView.spinner.stopAnimating()
+        contentView.configure(char: viewModel.char)
+    }
+    
+    private func showErrorState() {
+        showErrorAlert(title: "Ops! ⚠️", message: "Não foi possível carregar os detalhes.")
     }
 }
 
@@ -61,12 +82,9 @@ extension DetailsViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TransformationCell.identifier, for: indexPath) as? TransformationCell else {
-            return UICollectionViewCell()
-        }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TransformationCell.identifier, for: indexPath) as? TransformationCell else { return UICollectionViewCell() }
         
         cell.configure(with: viewModel.char.transformations[indexPath.item])
-        
         return cell
     }
 }
