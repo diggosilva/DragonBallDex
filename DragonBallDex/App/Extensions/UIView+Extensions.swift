@@ -18,4 +18,10 @@ extension UIView {
         view.layer.shadowOpacity = 0.3
         view.layer.shadowRadius = 7.0
     }
+    
+    func buildSpinner() -> UIActivityIndicatorView {
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        return spinner
+    }
 }
