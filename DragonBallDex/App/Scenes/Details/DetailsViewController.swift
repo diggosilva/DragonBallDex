@@ -108,6 +108,7 @@ extension DetailsViewController: UICollectionViewDelegate {
             description: "Transformação de \(char.name)",
             image: transformation.image,
             affiliation: char.affiliation,
+            originPlanet: char.originPlanet,
             transformations: char.transformations
         )
         
