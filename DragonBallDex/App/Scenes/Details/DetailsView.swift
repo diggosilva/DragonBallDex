@@ -102,6 +102,50 @@ final class DetailsView: UIView {
         return stack
     }()
     
+    // Planeta
+    lazy var planetImage: UIImageView = {
+        let image = UIImageView()
+        image.contentMode = .scaleAspectFit
+        image.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        image.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        image.layer.cornerRadius = 8
+        image.clipsToBounds = true
+        image.contentMode = .scaleAspectFill
+        return image
+    }()
+    
+    lazy var planetName: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16, weight: .bold)
+        return label
+    }()
+    
+    lazy var planetInfo: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.textColor = .secondaryLabel
+        label.numberOfLines = 0
+        return label
+    }()
+    
+    lazy var planetInfoStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [planetName, planetInfo])
+        stack.axis = .vertical
+        return stack
+    }()
+    
+    lazy var planetStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [planetImage, planetInfoStack])
+        stack.axis = .horizontal
+        stack.layer.cornerRadius = 8
+        stack.spacing = 8
+        stack.backgroundColor = .tertiarySystemBackground
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
+        applyShadow(view: stack)
+        return stack
+    }()
+    
     // Transformações
     lazy var transformationsSection: UIStackView = {
         let divider = UIView()
@@ -160,6 +204,7 @@ final class DetailsView: UIView {
         mainStack.addArrangedSubview(descriptionLabelTitle)
         mainStack.addArrangedSubview(descriptionLabel)
         mainStack.addArrangedSubview(statsStack)
+        mainStack.addArrangedSubview(planetStack)
         mainStack.addArrangedSubview(transformationsSection)
         
         NSLayoutConstraint.activate([
@@ -193,6 +238,15 @@ final class DetailsView: UIView {
     // MARK: - Configuration
     func configure(char: Char) {
         guard let url = URL(string: char.image) else { return }
+        guard let planetUrl = URL(string: char.originPlanet?.image ?? "") else { return }
+        
+        if let planetStatus = char.originPlanet?.isDestroyed {
+            if planetStatus {
+                planetName.text = "\(char.originPlanet?.name ?? "") - Destruído"
+            } else {
+                planetName.text = char.originPlanet?.name
+            }
+        }
         
         charImage.sd_setImage(with: url)
         nameLabel.text = char.name
@@ -200,6 +254,9 @@ final class DetailsView: UIView {
         descriptionLabel.text = char.description
         kiLabelValue.text = char.formattedKiDetails
         maxKiLabelValue.text = char.formattedMaxKiDetails
+        planetImage.sd_setImage(with: planetUrl)
+  
+        planetInfo.text = char.originPlanet?.description
         
         self.transformations = char.transformations
         
