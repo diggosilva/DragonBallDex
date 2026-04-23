@@ -22,6 +22,7 @@ struct Item: Codable {
     let description: String
     let image: String
     let affiliation: String
+    let originPlanet: Char.OriginPlanet?
     let transformations: [Char.Transformation]?
 }
 
@@ -45,6 +46,7 @@ extension Item {
             description: description,
             image: image,
             affiliation: affiliation,
+            originPlanet: originPlanet,
             transformations: transformations ?? []
         )
     }

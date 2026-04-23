@@ -17,7 +17,16 @@ struct Char: Codable, Hashable {
     let description: String
     let image: String
     let affiliation: String
+    let originPlanet: OriginPlanet?
     let transformations: [Transformation]
+    
+    struct OriginPlanet: Codable, Hashable {
+        let id: Int
+        let name: String
+        var isDestroyed: Bool
+        let description: String
+        let image: String
+    }
     
     struct Transformation: Codable, Hashable {
         let id: Int
